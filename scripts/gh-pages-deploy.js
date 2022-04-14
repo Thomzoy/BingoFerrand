@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
-const execa = require("execa");
-const fs = require("fs");
+
 (async () => {
     try {
+        const { execa } = await import("execa");
+        const { fs } = await import("fs");
         await execa("git", ["checkout", "--orphan", "gh-pages"]);
         // eslint-disable-next-line no-console
         console.log("Building started...");
@@ -10,6 +11,7 @@ const fs = require("fs");
         // await execa("yarn", ["build"]);
         // Understand if it's dist or build folder
         const folderName = fs.existsSync("dist") ? "dist" : "build";
+        fs.writeFile('dist/.nojekyll', '');
         await execa("git", ["--work-tree", folderName, "add", "--all"]);
         await execa("git", ["--work-tree", folderName, "commit", "-m", "gh-pages"]);
         console.log("Pushing to gh-pages...");
