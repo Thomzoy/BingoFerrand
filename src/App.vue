@@ -7,13 +7,17 @@
     </h1>
     <p>Cliquer pour aligner 5 expressions de notre brave Franck Ferrand !</p>
     <p>Rechargez la page pour mélanger les cartes</p>
+    <center>
     <div class="board">
       <CellButton :word="item" v-for="(item, index) in words" :key="`word-${index}`" />
     </div>
-    <span class="test-podcast">
-      {{ podcast }}
-    </span>
-    <iframe v-if="loaded" title='le-podcast' frameborder="0" loading="lazy" id="ausha-vuVx" height="220" style="border: none; width:100%; height:220px" src="https://player.ausha.co/index.html?podcastId=B4ePjTpOYnd4&v=3&playerId=ausha-vuVx"></iframe>
+    </center>
+    <h2>
+      <span>
+        <a style="color:#244d66;">D<span style="color:#728294;">ERNIER</span> PODCAST:</a>
+      </span>
+    </h2>
+    <iframe title='le-podcast' frameborder="0" id="ausha-vuVx" height="220" style="border: none; width:100%; height:220px" v-bind:src= "podcastPath" ></iframe>
   </main>
 </template>
 
@@ -21,28 +25,31 @@
 
 import axios from 'axios';
 import CellButton from '@/components/Cell.vue';
+import cheerio from 'cheerio'
 
 export default {
   name: 'App',
   components: { CellButton },
   data() {
     return {
-      podcast: null,
+      loaded: false,
+      podcastId: null,
+      podcastPath: null,
       words: [
         'Un livre qui vient de paraître',
         'Si vous me passez l\'expression',
         'C\'est ce qui s\'appelle avoir ...',
-        'Commentaire sur la tenue de Christian Morin',
+        '"Commentaire sur la tenue de Christian Morin"',
         'La suite, vous la connaissez !',
         'Est-ce que j\'ai besoin de vous le dire ?',
         'C\'est pas un rigolo !',
-        'Vous l\'avez, reconnu...',
-        'Anecdote de Christian Morin deja dîte',
+        'Vous l\'avez reconnu...',
+        '"Anecdote de Christian Morin deja dite"',
         '..., que l\'on salue',
         'L\'orchestre de la Scala de Milan était dirigé par Riccardo Mutti',
         'Aux éditions Perrin',
         'Qui a préparé cette émission',
-        'J\'avais déjà eu l\'occasion de vous raconter cette hitoire',
+        'J\'avais déjà eu l\'occasion de vous raconter cette histoire',
         'Et là, un homme',
         'Ca commence à sentir le roussi !',
         'Il faut l\'imaginer',
@@ -55,11 +62,6 @@ export default {
         'On dirait aujourd\'hui que ...',
         'Le tout-Paris',
       ],
-      iframe: {
-        src: window.location.href,
-        style: null,
-        wrapperStyle: null,
-      },
     };
   },
   methods: {
@@ -81,21 +83,25 @@ export default {
       return array;
     },
     getPodcast() {
-      const URL = 'https://www.radioclassique.fr/radio/emissions/franck-ferrand-raconte/';
+      const URL = 'https://corsanywhere.herokuapp.com/https://www.radioclassique.fr/radio/emissions/franck-ferrand-raconte/';
       axios.get(URL)
         .then((response) => {
-          this.podcast = response.status;
-          console.log(response.data);
+          const $ = cheerio.load(response.data);
+          const podcastPath = $('iframe')[0].attribs["data-lazy-src"];
+          let urlParams = new URLSearchParams(podcastPath)
+          const podcastId = urlParams.get('podcastId');
+          console.log(podcastId);
+          this.podcastPath = "https://player.ausha.co/index.html?v=3&display=horizontal&playerId=ausha-t6YA&podcastId=" + podcastId
         })
         .catch((err) => {
           console.log(err);
         });
     },
     testPod() {
-      console.log(axios.get('https://cors-anywhere-herokuapp.com/https://www.radioclassique.fr/radio/emissions/franck-ferrand-raconte/', {
+      console.log(axios.get('https://corsanywhere.herokuapp.com/https://www.radioclassique.fr/radio/emissions/franck-ferrand-raconte/', {
         headers: {
         },
-      }).data);
+      }));
     },
   },
   mounted() {
@@ -107,7 +113,7 @@ export default {
     document.head.appendChild(jq);
     this.words = this.shuffle(this.words);
     this.testPod();
-    this.loaded = true;
+    this.getPodcast();
   },
 };
 </script>
@@ -154,3 +160,6 @@ h1 {
   width: 160 * 5px;
 }
 </style>
+
+
+
