@@ -131,20 +131,15 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
+h2 {
+  font-family: 'League Gothic';
+  font-size: 5rem;
+}
 h1 {
   font-family: 'League Gothic';
   font-size: 8rem;
   margin: 0;
   line-height: 1.2;
-  background-image: linear-gradient(to left,
-      #0dc4b7,
-      #9a2654,
-      #2a47d5,
-      #19d519,
-      #e9ff00,
-      #ff8000,
-      #f30a0a
-  );
   -webkit-background-clip: text;
   color: transparent;
 }
