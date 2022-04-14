@@ -3,7 +3,7 @@
 (async () => {
     try {
         const { execa } = await import("execa");
-        const { fs } = await import("fs");
+        const fs = await import("fs");
         await execa("git", ["checkout", "--orphan", "gh-pages"]);
         // eslint-disable-next-line no-console
         console.log("Building started...");
@@ -11,7 +11,8 @@
         // await execa("yarn", ["build"]);
         // Understand if it's dist or build folder
         const folderName = fs.existsSync("dist") ? "dist" : "build";
-        fs.writeFile('dist/.nojekyll', '');
+        const noop = () => { };
+        fs.writeFile(folderName + '/.nojekyll', '', noop);
         await execa("git", ["--work-tree", folderName, "add", "--all"]);
         await execa("git", ["--work-tree", folderName, "commit", "-m", "gh-pages"]);
         console.log("Pushing to gh-pages...");
